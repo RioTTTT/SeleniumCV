@@ -29,12 +29,10 @@ public class PostPage extends BasePage{
         String postUrl = driver.getCurrentUrl();
         webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(POST_TITLE)));
         String title = driver.findElement(By.xpath(POST_TITLE)).getText();
-        Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("src/main/resources/posturls.csv"),"utf-8"));
-        writer.write (postUrl + " - " + title + ";");
+        Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("src/main/resources/posturls.csv",true),"utf-8"));
+        writer.write (postUrl + " - " + title + ";" + "\n");
         writer.close();
         return this;
     }
 
-//    Path filePath = Paths.get("src/test/resources/code_generator/"+pageName+".txt");
-//Files.write(filePath, ids, StandardCharsets.UTF_8);
 }

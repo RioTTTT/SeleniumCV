@@ -9,12 +9,12 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import static ru.yandex.qatools.htmlelements.matchers.common.HasTextMatcher.hasText;
+
 public class MainPage extends BasePage {
     private final static String UNAUTH_PROFILE_BUTTON = "//div[@class='tm-dropdown']";
     private final static String AUTH_PROFILE_BUTTON = "//div[@data-test-id='menu-toggle-user']";
@@ -25,7 +25,7 @@ public class MainPage extends BasePage {
     private final static String GET_FIRST_POST_TITLE = "//h2[@class='tm-article-snippet__title tm-article-snippet__title_h2']" +
             "/ancestor::div[@class='tm-articles-list']/article[1]/div/h2";
     private final static String CLICK_FIRST_POST = "//a[@class='tm-article-snippet__title-link'][1]";
-    private final static String GET_ALL_POSTS = "//a[@class='tm-article-snippet__title-link']";
+    private final static String GET_ALL_POSTS = "//h2/a";
     private final static String YOUTUBE_LINK = "//a[@href='https://www.youtube.com/channel/UCd_sTwKqVrweTt4oAKY5y4w']";
     private final static String LOGOUT_BUTTON = "//a[@rel='nofollow']";
     private final static String CHECK_LOGOUT = "//a[@href='https://habr.com/kek/v1/auth/habrahabr/?back=/ru/all/&hl=ru']";
@@ -49,6 +49,7 @@ public class MainPage extends BasePage {
         unAuthProfileButton.click();
         return this;
     }
+
     @FindBy(xpath = LOGIN_BUTTON)
     private WebElement loginButton;
 
@@ -59,6 +60,7 @@ public class MainPage extends BasePage {
         loginButton.click();
         return new LoginPage(driver);
     }
+
     @FindBy(xpath = AUTH_PROFILE_BUTTON)
     private WebElement authProfileButton;
 
@@ -75,6 +77,7 @@ public class MainPage extends BasePage {
         MatcherAssert.assertThat(driver.findElement(By.xpath(USER_NAME)), hasText("@lol4444"));
         return this;
     }
+
     @FindBy(xpath = RUVDS)
     private WebElement ruvdsButton;
 
@@ -84,15 +87,17 @@ public class MainPage extends BasePage {
         ruvdsButton.click();
         return new FollowPage(driver);
     }
+
     @FindBy(xpath = GET_FIRST_POST_TITLE)
     private WebElement getTitle;
 
     @Step("Получить заголовок первого поста")
-    public MainPage getFirstPostTitle(){
+    public MainPage getFirstPostTitle() {
         webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(GET_FIRST_POST_TITLE)));
         String title = String.valueOf(driver.findElement(By.xpath(GET_FIRST_POST_TITLE)));
         return this;
     }
+
     @FindBy(xpath = CLICK_FIRST_POST)
     private WebElement firstPostButton;
 
@@ -102,6 +107,7 @@ public class MainPage extends BasePage {
         firstPostButton.click();
         return new PostPage(driver);
     }
+
     @FindBy(xpath = YOUTUBE_LINK)
     private WebElement youtubeButton;
 
@@ -111,6 +117,7 @@ public class MainPage extends BasePage {
         youtubeButton.click();
         return new ExternalResources(driver);
     }
+
     @FindBy(xpath = LOGOUT_BUTTON)
     private WebElement logoutButton;
 
@@ -120,6 +127,7 @@ public class MainPage extends BasePage {
         logoutButton.click();
         return new MainPage(driver);
     }
+
     @FindBy(xpath = CHECK_LOGOUT)
     private WebElement logoutMarker;
 
@@ -129,11 +137,12 @@ public class MainPage extends BasePage {
         MatcherAssert.assertThat(driver.findElement(By.xpath(CHECK_LOGOUT)), hasText("Войти"));
         return new MainPage(driver);
     }
+
     @FindBy(xpath = HEADER_SEARCH_BUTTON)
     private WebElement headerSearchButton;
 
     @Step("Кликнуть на кнопку поиска в хедере")
-    public MainPage headerSearchButtonClick(){
+    public MainPage headerSearchButtonClick() {
         webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(HEADER_SEARCH_BUTTON)));
         headerSearchButton.click();
         return new MainPage(driver);
@@ -143,14 +152,14 @@ public class MainPage extends BasePage {
     private WebElement searchPlaceholder;
 
     @Step("Кликнуть на плейсхолдер")
-    public MainPage clickSearchPlaceholder(){
+    public MainPage clickSearchPlaceholder() {
         webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(SEARCH_PLACEHOLDER)));
         searchPlaceholder.click();
         return new MainPage(driver);
     }
 
     @Step("Вставить слово для поиска")
-    public MainPage sendSearchTag(){
+    public MainPage sendSearchTag() {
         webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(SEARCH_PLACEHOLDER)));
         searchPlaceholder.sendKeys(searchTag);
         return new MainPage(driver);
@@ -160,24 +169,42 @@ public class MainPage extends BasePage {
     private WebElement placeSearchButton;
 
     @Step("Кликнуть на кнопку поиска в плейсхолдере")
-    public MainPage placeholderSearchButtonClick(){
+    public MainPage placeholderSearchButtonClick() {
         webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(PLACEHOLDER_SEARCH_BUTTON)));
         placeSearchButton.click();
         return new MainPage(driver);
     }
 
-    @FindBy(xpath = GET_ALL_POSTS)
-    ArrayList<WebElement>  getAllPosts;
 
     @Step("Получить все посты")
-    public void printAllTitles(){
-        getAllPosts.forEach(e -> System.out.println(e.findElement(By.xpath(POST_TITLE)).getText()));
-
+    public void printAllTitles() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        List<WebElement> links = driver.findElements(By.xpath(GET_ALL_POSTS));
+        for (WebElement element:links){
+            String urls = element.getAttribute("href");
+            Writer writer = null;
+            try {
+                writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("src/main/resources/posturls.csv",true),"utf-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            try {
+                writer.write (urls + ";" + "\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
-//    @Step("Кликнуть на кнопку поиска в плейсхолдере")
-//    public MainPage placeholderSearchButtonClick(){
-//        webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(PLACEHOLDER_SEARCH_BUTTON)));
-//        placeSearchButton.click();
-//        return new MainPage(driver);
-//    }
+
 }

@@ -106,7 +106,7 @@ public class HabrPageObjectTest {
 
     @DisplayName("Копирование ссылки поста")
     @Test
-    public void copyAllLink() throws IOException {
+    public void copyAllLink(){
         new MainPage(driver)
                 .headerSearchButtonClick()
                 .clickSearchPlaceholder()
@@ -114,8 +114,8 @@ public class HabrPageObjectTest {
                 .placeholderSearchButtonClick()
                 .printAllTitles();
     }
-//    @AfterEach
-//    void closeDriver() {
-//        driver.quit();
-//    }
+    @AfterEach
+    void closeDriver() {
+        driver.quit();
+    }
 }
