@@ -24,7 +24,7 @@ public class HabrPageObjectTest {
     void initDriver() {
         driver = new EventFiringDecorator(new CustomLogger()).decorate(new ChromeDriver());
         driver.manage().window().maximize();
-        driver.get(Endpoints.COMMON_URL);
+        driver.get(Endpoints.COMMON_URL_HABR);
     }
 
     @DisplayName("Авторизация")
@@ -36,9 +36,35 @@ public class HabrPageObjectTest {
                 .beforeTests()
                 .fillLogin(LoginPage.mail)
                 .fillPassword(LoginPage.password)
-                .clickLoginButton()
+                .clickLoginButtonPositive()
                 .clickProfileButtonAuthed()
                 .checkAuth();
+    }
+
+    @DisplayName("Авторизация неправильный Email")
+    @Test
+    void authorizationIncorrectLogin(){
+        new MainPage(driver)
+                .clickProfileButtonUnAuthed()
+                .clickLoginButton()
+                .beforeTests()
+                .fillLogin("mail")
+                .fillPassword(LoginPage.password)
+                .clickLoginButtonNegative()
+                .loginErrorEmail();
+    }
+
+    @DisplayName("Авторизация неправильный пароль")
+    @Test
+    void authorizationIncorrectPassword(){
+        new MainPage(driver)
+                .clickProfileButtonUnAuthed()
+                .clickLoginButton()
+                .beforeTests()
+                .fillLogin(LoginPage.mail)
+                .fillPassword("password")
+                .clickLoginButtonNegative()
+                .loginError();
     }
 
     @DisplayName("Добавление поста в избранное")
@@ -50,13 +76,12 @@ public class HabrPageObjectTest {
                 .beforeTests()
                 .fillLogin(LoginPage.mail)
                 .fillPassword(LoginPage.password)
-                .clickLoginButton()
+                .clickLoginButtonPositive()
                 .ruvdsClick()
                 .activateFollow()
                 .chekFollow()
                 .unFollow();
     }
-
 
     @DisplayName("Открыть пост не авторизованная зона")
     @Test
@@ -65,6 +90,22 @@ public class HabrPageObjectTest {
                 .getFirstPostTitle()
                 .firstPost()
                 .checkTitle();
+    }
+
+    @DisplayName("Переход на канал Habr на фейсбуке не авторизованная зона")
+    @Test
+    public void openFacebook() {
+        new MainPage(driver)
+                .facebook()
+                .checkFacebook();
+    }
+
+    @DisplayName("Переход на канал Habr во вконтакте не авторизованная зона")
+    @Test
+    public void openVk() {
+        new MainPage(driver)
+                .vk()
+                .checkVk();
     }
 
     @DisplayName("Переход на канал Habr на ютубе не авторизованная зона")
@@ -84,7 +125,7 @@ public class HabrPageObjectTest {
                 .beforeTests()
                 .fillLogin(LoginPage.mail)
                 .fillPassword(LoginPage.password)
-                .clickLoginButton()
+                .clickLoginButtonPositive()
                 .clickProfileButtonAuthed()
                 .logout()
                 .clickProfileButtonUnAuthed()
@@ -114,6 +155,9 @@ public class HabrPageObjectTest {
                 .placeholderSearchButtonClick()
                 .printAllTitles();
     }
+
+
+
     @AfterEach
     void closeDriver() {
         driver.quit();

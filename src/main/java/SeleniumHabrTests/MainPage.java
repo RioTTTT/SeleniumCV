@@ -10,7 +10,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 import static ru.yandex.qatools.htmlelements.matchers.common.HasTextMatcher.hasText;
@@ -27,12 +26,15 @@ public class MainPage extends BasePage {
     private final static String CLICK_FIRST_POST = "//a[@class='tm-article-snippet__title-link'][1]";
     private final static String GET_ALL_POSTS = "//h2/a";
     private final static String YOUTUBE_LINK = "//a[@href='https://www.youtube.com/channel/UCd_sTwKqVrweTt4oAKY5y4w']";
+    private final static String FACEBOOK_LINK = "//a[@href='https://www.facebook.com/habrahabr.ru']";
+    private final static String VK_LINK = "//a[@href='https://vk.com/habr']";
     private final static String LOGOUT_BUTTON = "//a[@rel='nofollow']";
     private final static String CHECK_LOGOUT = "//a[@href='https://habr.com/kek/v1/auth/habrahabr/?back=/ru/all/&hl=ru']";
     private final static String HEADER_SEARCH_BUTTON = "//a[@class='tm-header-user-menu__item tm-header-user-menu__search']";
     private final static String SEARCH_PLACEHOLDER = "//input[@class='tm-input-text-decorated__input']";
     private final static String PLACEHOLDER_SEARCH_BUTTON = "//span[@class='tm-svg-icon__wrapper tm-search__icon']";
     private final static String POST_TITLE = "//h1[@class='tm-article-snippet__title tm-article-snippet__title_h1']";
+
 
     public static String searchTag = "Тестирование";
 
@@ -66,7 +68,7 @@ public class MainPage extends BasePage {
 
     @Step("Кликнуть на иконку авторизованного профиля")
     public MainPage clickProfileButtonAuthed() {
-        webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(UNAUTH_PROFILE_BUTTON)));
+        webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(AUTH_PROFILE_BUTTON)));
         authProfileButton.click();
         return this;
     }
@@ -115,6 +117,26 @@ public class MainPage extends BasePage {
     public ExternalResources youtube() {
         webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(YOUTUBE_LINK)));
         youtubeButton.click();
+        return new ExternalResources(driver);
+    }
+
+    @FindBy(xpath = FACEBOOK_LINK)
+    private WebElement facebookButton;
+
+    @Step("Кликнуть на иконку Фейсбука в подвале")
+    public ExternalResources facebook() {
+        webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(FACEBOOK_LINK)));
+        facebookButton.click();
+        return new ExternalResources(driver);
+    }
+
+    @FindBy(xpath = VK_LINK)
+    private WebElement vkButton;
+
+    @Step("Кликнуть на иконку ВК в подвале")
+    public ExternalResources vk() {
+        webDriverWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.xpath(VK_LINK)));
+        vkButton.click();
         return new ExternalResources(driver);
     }
 
@@ -174,7 +196,6 @@ public class MainPage extends BasePage {
         placeSearchButton.click();
         return new MainPage(driver);
     }
-
 
     @Step("Получить все посты")
     public void printAllTitles() {
